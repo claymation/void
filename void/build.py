@@ -24,6 +24,9 @@ def build(srcroot, dstroot):
         srcdir, srcdirs, srcfiles, srcdirfd = src
         dstdir, dstdirs, dstfiles, dstdirfd = dst
 
+        # ignore hidden files and directories
+        srcdirs[:] = [d for d in srcdirs if not d.startswith(".")]
+        srcfiles[:] = [f for f in srcfiles if not f.startswith(".")]
 
         build_dirs(srcdirs, dstdirs, dstdir)
         build_files(srcfiles, dstfiles, srcdir, dstdir)
