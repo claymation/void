@@ -2,6 +2,7 @@ import argparse
 import os
 
 from .build import build
+from .serve import serve
 
 def main():
     parser = argparse.ArgumentParser(
@@ -13,6 +14,12 @@ def main():
     parser.add_argument("-r", "--rebuild",
         help="Rebuild all files, regardless of mtime",
         action="store_true")
+    parser.add_argument("-s", "--serve",
+        help="Start an HTTP server on localhost",
+        action="store_true")
+    parser.add_argument("-p", "--port",
+        help="HTTP port",
+        default=8000)
 
     args = parser.parse_args()
 
@@ -25,6 +32,9 @@ def main():
         parser.error("failed to create dstdir {}".format(args.dstdir))
 
     build(args.src, args.dstdir, rebuild=args.rebuild)
+
+    if args.serve:
+        serve(args.dstdir, args.port)
 
 if __name__ == "__main__":
     main()
