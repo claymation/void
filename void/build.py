@@ -1,9 +1,22 @@
+import contextlib
 import os
 import shutil
+import subprocess
+import tempfile
 
 import CommonMark
 
 from jinja2 import Environment, ChoiceLoader, FileSystemLoader, PackageLoader
+
+
+@contextlib.contextmanager
+def cd(newdir):
+    olddir = os.getcwd()
+    os.chdir(newdir)
+    try:
+        yield
+    finally:
+        os.chdir(olddir)
 
 env = Environment(
     loader=ChoiceLoader([
@@ -99,6 +112,7 @@ def render_markdown(src, dst):
     renderer = CommonMark.HtmlRenderer()
     with open(src, "r") as f:
         ast = parser.parse(f.read())
+    ast = compile_code_fragments(ast)
     context = {
         "title": extract_title(ast),
         "content": renderer.render(ast),
@@ -111,6 +125,40 @@ def render_template(src, dst, **context):
 
     with open(dst, "w") as f:
         f.write(html)
+
+def compile_code_fragments(ast):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # extract code blocks by filename
+        for node, entering in ast.walker():
+            if node.t == "code_block" and node.info:
+                try:
+                    filetype, filename = node.info.split(maxsplit=1)
+                except ValueError:
+                    continue
+                if not filename.startswith("!"):
+                    print("  - extract {}".format(filename))
+                    with open(os.path.join(tmpdir, filename), "w") as f:
+                        f.write(node.literal)
+
+        # compile code fragments
+        for node, entering in ast.walker():
+            if node.t == "code_block" and node.info:
+                try:
+                    filetype, command = node.info.split(maxsplit=1)
+                except ValueError:
+                    continue
+                if command.startswith("!"):
+                    command = command[1:]
+                    print("  - exec {}".format(command))
+                    with cd(tmpdir):
+                        result = subprocess.run(command,
+                                                shell=True,
+                                                encoding="utf8",
+                                                stdout=subprocess.PIPE,
+                                                stderr=subprocess.PIPE)
+                        node.literal = result.stdout
+
+    return ast
 
 def extract_title(ast):
     for node, entering in ast.walker():
