@@ -10,7 +10,7 @@ env = Environment(
         PackageLoader("void"),
     ]), autoescape=True)
 
-def build(srcroot, dstroot):
+def build(srcroot, dstroot, rebuild=False):
     """
     Copy the contents of srcroot to dstroot, recursively,
     rendering Markdown files to HTML along the way.
@@ -32,7 +32,7 @@ def build(srcroot, dstroot):
         srcdirs[:] = [d for d in srcdirs if os.path.abspath(os.path.join(srcdir, d)) != os.path.abspath(dstroot)]
 
         build_dirs(srcdirs, dstdirs, dstdir)
-        build_files(srcfiles, dstfiles, srcdir, dstdir)
+        build_files(srcfiles, dstfiles, srcdir, dstdir, rebuild=rebuild)
 
 def build_dirs(srcdirs, dstdirs, dstdir):
     srcdirset = set(srcdirs)
@@ -53,11 +53,11 @@ def build_dirs(srcdirs, dstdirs, dstdir):
     # dstdirs must now equal srcdirs; make it so
     dstdirs[:] = srcdirs
 
-def build_files(srcfiles, dstfiles, srcdir, dstdir):
+def build_files(srcfiles, dstfiles, srcdir, dstdir, rebuild=False):
     dstfileset = set(dstfiles)
 
     for f in srcfiles:
-        f = copy_or_render(f, srcdir, dstdir)
+        f = copy_or_render(f, srcdir, dstdir, rebuild=rebuild)
         dstfileset.discard(f)
 
     # remove files in dstdir not in srcdir
@@ -65,7 +65,7 @@ def build_files(srcfiles, dstfiles, srcdir, dstdir):
         print("rm {}".format(os.path.join(dstdir, f)))
         os.unlink(os.path.join(dstdir, f))
 
-def copy_or_render(srcfile, srcdir, dstdir):
+def copy_or_render(srcfile, srcdir, dstdir, rebuild=False):
     dstfile = srcfile
     base, ext = os.path.splitext(srcfile)
 
@@ -73,15 +73,17 @@ def copy_or_render(srcfile, srcdir, dstdir):
         dstfile = "".join([base, os.extsep, "html"])
         maybe(render_markdown,
               os.path.join(srcdir, srcfile),
-              os.path.join(dstdir, dstfile))
+              os.path.join(dstdir, dstfile),
+              rebuild=rebuild)
     else:
         maybe(copy,
               os.path.join(srcdir, srcfile),
-              os.path.join(dstdir, dstfile))
+              os.path.join(dstdir, dstfile),
+              rebuild=rebuild)
     return dstfile
 
-def maybe(fn, src, dst, force=False):
-    if force or not os.path.exists(dst) or mtime(src) > mtime(dst):
+def maybe(fn, src, dst, rebuild=False):
+    if rebuild or not os.path.exists(dst) or mtime(src) > mtime(dst):
         fn(src, dst)
 
 def mtime(f):

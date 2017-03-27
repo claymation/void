@@ -10,6 +10,9 @@ def main():
         help="Source file or directory")
     parser.add_argument("dstdir",
         help="Destination directory")
+    parser.add_argument("-r", "--rebuild",
+        help="Rebuild all files, regardless of mtime",
+        action="store_true")
 
     args = parser.parse_args()
 
@@ -21,7 +24,7 @@ def main():
     except OSError:
         parser.error("failed to create dstdir {}".format(args.dstdir))
 
-    build(args.src, args.dstdir)
+    build(args.src, args.dstdir, rebuild=args.rebuild)
 
 if __name__ == "__main__":
     main()
