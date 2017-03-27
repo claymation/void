@@ -1,6 +1,14 @@
 import os
 import shutil
 
+import CommonMark
+
+from jinja2 import Environment, ChoiceLoader, FileSystemLoader, PackageLoader
+
+env = Environment(
+    loader=ChoiceLoader([
+        PackageLoader("void"),
+    ]), autoescape=True)
 
 def build(srcroot, dstroot):
     """
@@ -52,21 +60,22 @@ def build_files(srcfiles, dstfiles, srcdir, dstdir):
         os.unlink(os.path.join(dstdir, f))
 
 def copy_or_render(srcfile, srcdir, dstdir):
+    dstfile = srcfile
     base, ext = os.path.splitext(srcfile)
+
     if ext in (".markdown", ".md"):
-        dstfile = "".join((base, os.extsep, "html"))
-        maybe(render,
+        dstfile = "".join([base, os.extsep, "html"])
+        maybe(render_markdown,
               os.path.join(srcdir, srcfile),
               os.path.join(dstdir, dstfile))
     else:
-        dstfile = srcfile
         maybe(copy,
               os.path.join(srcdir, srcfile),
               os.path.join(dstdir, dstfile))
     return dstfile
 
-def maybe(fn, src, dst):
-    if not os.path.exists(dst) or mtime(src) > mtime(dst):
+def maybe(fn, src, dst, force=False):
+    if force or not os.path.exists(dst) or mtime(src) > mtime(dst):
         fn(src, dst)
 
 def mtime(f):
@@ -76,7 +85,26 @@ def copy(src, dst):
     print("cp {} {}".format(src, dst))
     shutil.copyfile(src, dst)
 
-def render(src, dst):
+def render_markdown(src, dst):
     print("render {} {}".format(src, dst))
-    shutil.copyfile(src, dst)
+    parser = CommonMark.Parser()
+    renderer = CommonMark.HtmlRenderer()
+    with open(src, "r") as f:
+        ast = parser.parse(f.read())
+    context = {
+        "title": extract_title(ast),
+        "content": renderer.render(ast),
+    }
+    render_template("page.html", dst, **context)
 
+def render_template(src, dst, **context):
+    template = env.get_template(src)
+    html = template.render(context)
+
+    with open(dst, "w") as f:
+        f.write(html)
+
+def extract_title(ast):
+    for node, entering in ast.walker():
+        if node.t == "heading" and node.level == 1:
+            return node.first_child.literal

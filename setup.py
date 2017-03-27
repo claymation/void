@@ -16,6 +16,10 @@ setup(
             "void = void.void:main",
         ]
     },
+    install_requires=[
+        "Jinja2",
+        "CommonMark",
+    ],
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
