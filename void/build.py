@@ -7,6 +7,11 @@ def build(srcroot, dstroot):
     Copy the contents of srcroot to dstroot, recursively,
     rendering Markdown files to HTML along the way.
     """
+    # if a source file is given, render it and return
+    if os.path.isfile(srcroot):
+        build_files([srcroot], [], os.path.dirname(srcroot), dstroot)
+        return
+
     for src, dst in zip(os.fwalk(srcroot), os.fwalk(dstroot)):
         srcdir, srcdirs, srcfiles, srcdirfd = src
         dstdir, dstdirs, dstfiles, dstdirfd = dst
