@@ -63,6 +63,24 @@ When rendering this page the given shell command will be run and its output
 substitution. Specifying the langugage as `txt` here is a convenient hack to
 avoid syntax highlighting in the output.
 
+## Status
+
+void has nearly reached the minimum viable product stage. I use it to generate
+my own [static web site](http://daemons.net). The few remaining things I want
+to do:
+
+  * actually add highlight.js
+  * provide more context to Jinja templates
+  * maybe define a separate index.html template
+  * allow local templates to override package templates
+  * support rendering of .html input files
+
+## Contributing
+
+Feel free to send me a [pull request][].
+
+
 [Milligram]: https://milligram.github.io/
 [highlight.js]: https://highlightjs.org/
 [info string]: http://spec.commonmark.org/0.27/#info-string
+[pull request]: https://github.com/claymation/void/pull/new/master

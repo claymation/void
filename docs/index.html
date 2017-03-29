@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+
+<title>void</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+<link rel="stylesheet" href="https://cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+<link rel="stylesheet" href="https://cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+
+<section class="container">
+  <h1>void</h1>
+<p>Render HTML content from Markdown source</p>
+<p>void is a simple static web site generator designed for programmers. It's
+so-named because it's devoid of the blogging features touted by other static
+site generators. void has no concept of posts, authors, dates, categories,
+tags, etc. void simply walks a tree of Markdown source files, passing them
+through CommonMark and Jinja2 to produce a tree of HTML output files. You can
+organize and index your content as you see fit; void preserves your directory
+structure and filenames.</p>
+<h2>Programmer-friendly features:</h2>
+<ul>
+<li>Minimalist design with clean typography, courtesy of <a href="https://milligram.github.io/">Milligram</a> styles</li>
+<li>Syntax highlighting, courtesy of <a href="https://highlightjs.org/">highlight.js</a></li>
+<li>Fenced code block extraction and substitution</li>
+</ul>
+<p>That last point deserves an explanation. Say you're writing about programming.
+To include a code sample in your Markdown you can use a fenced code block:</p>
+<pre><code>``` python
+def hello():
+    print(&quot;Hello, void.&quot;)
+
+hello()
+```
+
+When run as `python hello.py`, we see:
+
+``` txt
+Hello, void.
+```
+</code></pre>
+<p>You'd like to know that your code sample doesn't contain any egregious syntax
+errors, and that it produces the output that you expect. You may also want to
+allow readers to download your embedded code snippets.</p>
+<p>With void, you can give a fenced code block a filename and it'll be extracted
+to a file in the output directory when rebuilding the page. Provide the
+filename as the second word in the <a href="http://spec.commonmark.org/0.27/#info-string">info string</a> (the first word, here
+<code>python</code>, defines the language for the syntax highlighter):</p>
+<pre><code>``` python hello.py
+def hello():
+	print(&quot;Hello, void.&quot;)
+
+hello()
+```
+</code></pre>
+<p>When rendering this page the file hello.py will be created in the output
+directory (adjacent to the rendered .html file). That's fenced code block
+extraction.</p>
+<p>To test your code snippet and embed its output in your rendered HTML, define
+an empty fenced code block and specify a shell command prefixed with a bang
+(!) in the info string:</p>
+<pre><code>``` txt !python hello.py
+```
+</code></pre>
+<p>When rendering this page the given shell command will be run and its output
+(stdout) will be substitued into the code block. That's fenced code block
+substitution. Specifying the langugage as <code>txt</code> here is a convenient hack to
+avoid syntax highlighting in the output.</p>
+<h2>Status</h2>
+<p>void has nearly reached the minimum viable product stage. I use it to generate
+my own <a href="http://daemons.net">static web site</a>. The few remaining things I want
+to do:</p>
+<ul>
+<li>actually add highlight.js</li>
+<li>provide more context to the Jinja templates</li>
+<li>support rendering of .html input files</li>
+<li>maybe define a separate index.html template</li>
+</ul>
+<h2>Contributing</h2>
+<p>Feel free to send me a <a href="https://github.com/claymation/void/pull/new/master">pull request</a>.</p>
+
+</section>
