@@ -28,6 +28,9 @@ def build(srcroot, dstroot):
         srcdirs[:] = [d for d in srcdirs if not d.startswith(".")]
         srcfiles[:] = [f for f in srcfiles if not f.startswith(".")]
 
+        # do not descend into dstroot if it is a subdirectory of srcroot
+        srcdirs[:] = [d for d in srcdirs if os.path.abspath(os.path.join(srcdir, d)) != os.path.abspath(dstroot)]
+
         build_dirs(srcdirs, dstdirs, dstdir)
         build_files(srcfiles, dstfiles, srcdir, dstdir)
 
