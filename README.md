@@ -5,9 +5,9 @@ void is a simple static web site generator designed for programmers. It's
 so-named because it's devoid of the blogging features touted by other static
 site generators. void has no concept of posts, authors, dates, categories,
 tags, etc. void simply walks a tree of Markdown source files, passing them
-through CommonMark and Jinja2 to produce a tree of HTML output files. You can
-organize and index your content as you see fit; void preserves your directory
-structure and filenames.
+through [CommonMark][] and [Jinja2][] to produce a tree of HTML output files.
+You can organize and index your content as you see fit; void preserves your
+directory structure and filenames.
 
 ## Programmer-friendly features:
 
@@ -69,7 +69,6 @@ void has nearly reached the minimum viable product stage. I use it to generate
 my own [static web site](http://daemons.net). The few remaining things I want
 to do:
 
-  * actually add highlight.js
   * provide more context to Jinja templates
   * maybe define a separate index.html template
   * allow local templates to override package templates
@@ -80,6 +79,8 @@ to do:
 Feel free to send me a [pull request][].
 
 
+[CommonMark]: http://commonmark.org/
+[Jinja2]: http://jinja.pocoo.org/
 [Milligram]: https://milligram.github.io/
 [highlight.js]: https://highlightjs.org/
 [info string]: http://spec.commonmark.org/0.27/#info-string
