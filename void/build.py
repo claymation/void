@@ -96,11 +96,14 @@ def copy_or_render(srcfile, srcdir, dstdir, rebuild=False):
     return dstfile
 
 def maybe(fn, src, dst, rebuild=False):
-    if rebuild or not os.path.exists(dst) or mtime(src) > mtime(dst):
+    if rebuild or missing(dst) or updated(src, dst):
         fn(src, dst)
 
-def mtime(f):
-    return os.stat(f).st_mtime
+def missing(f):
+    return not os.path.exists(f)
+
+def updated(p, q):
+    return os.path.getmtime(p) > os.path.getmtime(q)
 
 def copy(src, dst):
     print("cp {} {}".format(src, dst))
