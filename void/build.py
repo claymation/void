@@ -82,7 +82,7 @@ def copy_or_render(srcfile, srcdir, dstdir, rebuild=False):
     dstfile = srcfile
     base, ext = os.path.splitext(srcfile)
 
-    if ext in (".markdown", ".md"):
+    if ext in (".markdown", ".mkd", ".md"):
         dstfile = "".join([base, os.extsep, "html"])
         maybe(render_markdown,
               os.path.join(srcdir, srcfile),
