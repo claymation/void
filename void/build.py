@@ -33,19 +33,26 @@ def build(srcroot, dstroot, rebuild=False):
         build_files([srcroot], [], os.path.dirname(srcroot), dstroot)
         return
 
+    # allow local templates to override package templates
+    environment.loader.loaders.insert(0,
+            FileSystemLoader(os.path.join(srcroot, "_templates")))
+
     for src, dst in zip(os.fwalk(srcroot), os.fwalk(dstroot)):
         srcdir, srcdirs, srcfiles, srcdirfd = src
         dstdir, dstdirs, dstfiles, dstdirfd = dst
 
-        # ignore hidden files and directories
-        srcdirs[:] = [d for d in srcdirs if not d.startswith(".")]
-        srcfiles[:] = [f for f in srcfiles if not f.startswith(".")]
+        # ignore hidden and special files and directories
+        srcdirs[:] = [d for d in srcdirs if not is_hidden_or_special(d)]
+        srcfiles[:] = [f for f in srcfiles if not is_hidden_or_special(f)]
 
         # do not descend into dstroot if it is a subdirectory of srcroot
         srcdirs[:] = [d for d in srcdirs if os.path.abspath(os.path.join(srcdir, d)) != os.path.abspath(dstroot)]
 
         build_dirs(srcdirs, dstdirs, dstdir)
         build_files(srcfiles, dstfiles, srcdir, dstdir, rebuild=rebuild)
+
+def is_hidden_or_special(x):
+    return x.startswith(".") or x.startswith("_")
 
 def build_dirs(srcdirs, dstdirs, dstdir):
     srcdirset = set(srcdirs)

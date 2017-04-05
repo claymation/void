@@ -71,7 +71,6 @@ to do:
 
   * provide more context to Jinja templates
   * maybe define a separate index.html template
-  * allow local templates to override package templates
 
 ## Contributing
 
