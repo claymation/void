@@ -12,9 +12,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
+{% block body %}
 <section class="container">
   {{ content|safe }}
 </section>
+{% endblock %}
 
 <section class="container">
   <small>Built with <a href="https://claymation.github.io/void/">void</a>.</small>

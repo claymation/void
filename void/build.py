@@ -18,7 +18,7 @@ def cd(newdir):
     finally:
         os.chdir(olddir)
 
-env = Environment(
+environment = Environment(
     loader=ChoiceLoader([
         PackageLoader("void"),
     ]), autoescape=True)
@@ -83,16 +83,17 @@ def copy_or_render(srcfile, srcdir, dstdir, rebuild=False):
     base, ext = os.path.splitext(srcfile)
 
     if ext in (".markdown", ".mkd", ".md"):
+        fn = render_markdown
         dstfile = "".join([base, os.extsep, "html"])
-        maybe(render_markdown,
-              os.path.join(srcdir, srcfile),
-              os.path.join(dstdir, dstfile),
-              rebuild=rebuild)
+    elif ext in (".html", ".htm"):
+        fn = render_html
     else:
-        maybe(copy,
-              os.path.join(srcdir, srcfile),
-              os.path.join(dstdir, dstfile),
-              rebuild=rebuild)
+        fn = copy
+
+    maybe(fn,
+          os.path.join(srcdir, srcfile),
+          os.path.join(dstdir, dstfile),
+          rebuild=rebuild)
     return dstfile
 
 def maybe(fn, src, dst, rebuild=False):
@@ -120,10 +121,20 @@ def render_markdown(src, dst):
         "title": extract_title(ast),
         "content": renderer.render(ast),
     }
-    render_template("page.html", dst, **context)
+    template = environment.get_template("page.html")
+    render_template(template, dst, context)
 
-def render_template(src, dst, **context):
-    template = env.get_template(src)
+def render_html(src, dst):
+    print("render {} {}".format(src, dst))
+    with open(src, "r") as f:
+        source = f.read()
+
+    code = environment.compile(source, src, src)
+    context = {}
+    template = environment.template_class.from_code(environment, code, globals())
+    render_template(template, dst, context)
+
+def render_template(template, dst, context):
     html = template.render(context)
 
     with open(dst, "w") as f:
