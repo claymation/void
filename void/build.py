@@ -126,6 +126,7 @@ def render_markdown(src, dst):
     ast = compile_code_fragments(ast)
     context = {
         "title": extract_title(ast),
+        "headings": extract_headings(ast),
         "content": renderer.render(ast),
     }
     template = environment.get_template("page.html")
@@ -185,3 +186,10 @@ def extract_title(ast):
     for node, entering in ast.walker():
         if node.t == "heading" and node.level == 1:
             return node.first_child.literal
+
+def extract_headings(ast):
+    headings = []
+    for node, entering in ast.walker():
+        if entering and node.t == "heading":
+            headings.append((node.level, node.first_child.literal))
+    return headings
