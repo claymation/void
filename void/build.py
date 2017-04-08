@@ -19,6 +19,7 @@ def cd(newdir):
         os.chdir(olddir)
 
 environment = Environment(
+    extensions=["jinja2.ext.do"],
     loader=ChoiceLoader([
         PackageLoader("void"),
     ]), autoescape=True)
