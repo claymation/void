@@ -17,8 +17,9 @@ setup(
         ]
     },
     install_requires=[
-        "Jinja2",
+        "awesome-slugify",
         "CommonMark",
+        "Jinja2",
     ],
     classifiers=[
         "Programming Language :: Python",

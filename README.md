@@ -68,8 +68,6 @@ avoid syntax highlighting in the output.
 void has reached the minimum viable product stage. I use it to generate my own
 [static web site](http://daemons.net). The few remaining things I want to do:
 
-  * generate heading anchors
-  * pass heading list to template for on-page nav
   * pass document tree to template for site-wide nav
   * extract fenced code blocks to dstdir
 

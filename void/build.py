@@ -8,6 +8,10 @@ import CommonMark
 
 from jinja2 import Environment, ChoiceLoader, FileSystemLoader, PackageLoader
 
+from slugify import slugify
+
+from .render import HtmlRenderer
+
 
 @contextlib.contextmanager
 def cd(newdir):
@@ -121,7 +125,7 @@ def copy(src, dst):
 def render_markdown(src, dst):
     print("render {} {}".format(src, dst))
     parser = CommonMark.Parser()
-    renderer = CommonMark.HtmlRenderer()
+    renderer = HtmlRenderer()
     with open(src, "r") as f:
         ast = parser.parse(f.read())
     ast = compile_code_fragments(ast)
@@ -192,5 +196,7 @@ def extract_headings(ast):
     headings = []
     for node, entering in ast.walker():
         if entering and node.t == "heading":
-            headings.append((node.level, node.first_child.literal))
+            headings.append((node.level,
+                             node.first_child.literal,
+                             slugify(node.first_child.literal)))
     return headings
