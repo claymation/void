@@ -3,6 +3,9 @@ import os
 import socketserver
 
 
+socketserver.allow_reuse_address = True
+
+
 def serve(root, port):
     Handler = http.server.SimpleHTTPRequestHandler
 
