@@ -134,8 +134,15 @@ def render_markdown(src, dst):
         "headings": extract_headings(ast),
         "content": renderer.render(ast),
     }
-    template = environment.get_template("page.html")
-    render_template(template, dst, context)
+    render_template(get_template_for(src), dst, context)
+
+def get_template_for(src):
+    fname = os.path.basename(src)
+    if fname == "index.md":
+        template_name = "index.html"
+    else:
+        template_name = "page.html"
+    return environment.get_template(template_name)
 
 def render_html(src, dst):
     print("render {} {}".format(src, dst))
