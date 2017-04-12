@@ -8,6 +8,7 @@ class HtmlRenderer(CommonMarkHtmlRenderer):
     Extends the CommonMark HTMLRenderer, adding:
 
       * heading ids
+      * code.nohighlight if no info string is given
     """
 
     def heading(self, node, entering):
@@ -20,3 +21,20 @@ class HtmlRenderer(CommonMarkHtmlRenderer):
         else:
             self.tag("/" + tagname)
             self.cr()
+
+    def code_block(self, node, entering):
+        info_words = node.info.split() if node.info else []
+        attrs = self.attrs(node)
+        if len(info_words) > 0 and len(info_words[0]) > 0:
+            attrs.append(["class", "language-" +
+                          self.escape(info_words[0], True)])
+        else:
+            attrs.append(["class", "nohighlight"])
+
+        self.cr()
+        self.tag("pre")
+        self.tag("code", attrs)
+        self.out(node.literal)
+        self.tag("/code")
+        self.tag("/pre")
+        self.cr()
