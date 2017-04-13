@@ -128,7 +128,8 @@ def render_markdown(src, dst):
     renderer = HtmlRenderer()
     with open(src, "r") as f:
         ast = parser.parse(f.read())
-    ast = compile_code_fragments(ast)
+    collapse_text_nodes(ast)
+    compile_code_fragments(ast)
     context = {
         "title": extract_title(ast),
         "headings": extract_headings(ast),
@@ -159,6 +160,16 @@ def render_template(template, dst, context):
 
     with open(dst, "w") as f:
         f.write(html)
+
+def collapse_text_nodes(ast):
+    walker = ast.walker()
+    for node, entering in walker:
+        if entering and node.t == "text":
+            nxt = node.nxt
+            if nxt is not None and nxt.t == "text":
+                node.literal += nxt.literal
+                nxt.unlink()
+                walker.resume_at(node, entering)
 
 def compile_code_fragments(ast):
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -191,8 +202,6 @@ def compile_code_fragments(ast):
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE)
                         node.literal = result.stdout
-
-    return ast
 
 def extract_title(ast):
     for node, entering in ast.walker():
