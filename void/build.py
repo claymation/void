@@ -81,16 +81,15 @@ def build_dirs(srcdirs, dstdirs, dstdir):
 def build_files(srcfiles, dstfiles, srcdir, dstdir, rebuild=False):
     dstfileset = set(dstfiles)
 
-    for f in srcfiles:
-        f = copy_or_render(f, srcdir, dstdir, rebuild=rebuild)
-        dstfileset.discard(f)
+    for srcfile in srcfiles:
+        copy_or_render(srcfile, srcdir, dstdir, rebuild, dstfileset)
 
     # remove files in dstdir not in srcdir
     for f in dstfileset:
         print("rm {}".format(os.path.join(dstdir, f)))
         os.unlink(os.path.join(dstdir, f))
 
-def copy_or_render(srcfile, srcdir, dstdir, rebuild=False):
+def copy_or_render(srcfile, srcdir, dstdir, rebuild, dstfileset):
     dstfile = srcfile
     base, ext = os.path.splitext(srcfile)
 
@@ -105,12 +104,14 @@ def copy_or_render(srcfile, srcdir, dstdir, rebuild=False):
     maybe(fn,
           os.path.join(srcdir, srcfile),
           os.path.join(dstdir, dstfile),
-          rebuild=rebuild)
-    return dstfile
+          rebuild,
+          dstfileset=dstfileset)
 
-def maybe(fn, src, dst, rebuild=False):
+    dstfileset.discard(dstfile)
+
+def maybe(fn, src, dst, rebuild, **kwargs):
     if rebuild or missing(dst) or updated(src, dst):
-        fn(src, dst)
+        fn(src, dst, **kwargs)
 
 def missing(f):
     return not os.path.exists(f)
@@ -118,18 +119,18 @@ def missing(f):
 def updated(p, q):
     return os.path.getmtime(p) > os.path.getmtime(q)
 
-def copy(src, dst):
+def copy(src, dst, **kwargs):
     print("cp {} {}".format(src, dst))
     shutil.copyfile(src, dst)
 
-def render_markdown(src, dst):
+def render_markdown(src, dst, dstfileset):
     print("render {} {}".format(src, dst))
     parser = CommonMark.Parser()
     renderer = HtmlRenderer()
     with open(src, "r") as f:
         ast = parser.parse(f.read())
     collapse_text_nodes(ast)
-    compile_code_fragments(ast)
+    compile_code_fragments(ast, os.path.dirname(dst), dstfileset)
     context = {
         "title": extract_title(ast),
         "headings": extract_headings(ast),
@@ -145,7 +146,7 @@ def get_template_for(src):
         template_name = "page.html"
     return environment.get_template(template_name)
 
-def render_html(src, dst):
+def render_html(src, dst, **kwargs):
     print("render {} {}".format(src, dst))
     with open(src, "r") as f:
         source = f.read()
@@ -171,7 +172,7 @@ def collapse_text_nodes(ast):
                 nxt.unlink()
                 walker.resume_at(node, entering)
 
-def compile_code_fragments(ast):
+def compile_code_fragments(ast, dstdir, dstfileset):
     with tempfile.TemporaryDirectory() as tmpdir:
         # extract code blocks by filename
         for node, entering in ast.walker():
@@ -182,8 +183,12 @@ def compile_code_fragments(ast):
                     continue
                 if not filename.startswith("!"):
                     print("  - extract {}".format(filename))
-                    with open(os.path.join(tmpdir, filename), "w") as f:
+                    tmpfile = os.path.join(tmpdir, filename)
+                    with open(tmpfile, "w") as f:
                         f.write(node.literal)
+                    dstfile = os.path.join(dstdir, filename)
+                    shutil.copyfile(tmpfile, dstfile)
+                    dstfileset.discard(filename)
 
         # compile code fragments
         for node, entering in ast.walker():

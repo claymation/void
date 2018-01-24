@@ -69,7 +69,6 @@ void has reached the minimum viable product stage. I use it to generate my own
 [static web site](http://daemons.net). The few remaining things I want to do:
 
   * pass document tree to template for site-wide nav
-  * extract fenced code blocks to dstdir
 
 ## Contributing
 
