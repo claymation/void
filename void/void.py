@@ -19,7 +19,7 @@ def main():
         action="store_true")
     parser.add_argument("-p", "--port",
         help="HTTP port",
-        default=8000)
+        type=int, default=8000)
 
     args = parser.parse_args()
 
