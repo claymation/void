@@ -133,6 +133,7 @@ def render_markdown(src, dst, dstfileset):
     compile_code_fragments(ast, os.path.dirname(dst), dstfileset)
     context = {
         "title": extract_title(ast),
+        "summary": extract_summary(ast),
         "headings": extract_headings(ast),
         "content": renderer.render(ast),
     }
@@ -212,6 +213,15 @@ def extract_title(ast):
     for node, entering in ast.walker():
         if node.t == "heading" and node.level == 1:
             return node.first_child.literal
+
+def extract_summary(ast):
+    for node, entering in ast.walker():
+        lines = []
+        if node.t == "paragraph":
+            for node, entering in node.walker():
+                if node.t == "text" and entering:
+                    lines.append(node.literal)
+            return " ".join(lines)
 
 def extract_headings(ast):
     headings = []
