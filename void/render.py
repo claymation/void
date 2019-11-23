@@ -1,9 +1,9 @@
-from CommonMark import HtmlRenderer as CommonMarkHtmlRenderer
+import commonmark
 
 from slugify import slugify
 
 
-class HtmlRenderer(CommonMarkHtmlRenderer):
+class HtmlRenderer(commonmark.HtmlRenderer):
     """
     Extends the CommonMark HTMLRenderer, adding:
 
@@ -26,8 +26,7 @@ class HtmlRenderer(CommonMarkHtmlRenderer):
         info_words = node.info.split() if node.info else []
         attrs = self.attrs(node)
         if len(info_words) > 0 and len(info_words[0]) > 0:
-            attrs.append(["class", "language-" +
-                          self.escape(info_words[0], True)])
+            attrs.append(["class", "language-" + self.escape(info_words[0])])
         else:
             attrs.append(["class", "nohighlight"])
 

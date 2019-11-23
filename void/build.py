@@ -4,7 +4,7 @@ import shutil
 import subprocess
 import tempfile
 
-import CommonMark
+import commonmark
 
 from jinja2 import Environment, ChoiceLoader, FileSystemLoader, PackageLoader
 
@@ -125,7 +125,7 @@ def copy(src, dst, **kwargs):
 
 def render_markdown(src, dst, dstfileset):
     print("render {} {}".format(src, dst))
-    parser = CommonMark.Parser()
+    parser = commonmark.Parser()
     renderer = HtmlRenderer()
     with open(src, "r") as f:
         ast = parser.parse(f.read())
