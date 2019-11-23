@@ -3,7 +3,8 @@ import os
 import socketserver
 
 
-socketserver.allow_reuse_address = True
+class TCPServer(socketserver.TCPServer):
+    allow_reuse_address = True
 
 
 def serve(root, port):
@@ -14,7 +15,7 @@ def serve(root, port):
 
     print("Listening for requests on http://localhost:{}/".format(port))
 
-    with socketserver.TCPServer(("", port), Handler) as httpd:
+    with TCPServer(("", port), Handler) as httpd:
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
