@@ -11,12 +11,13 @@ class WatchHandler(PatternMatchingEventHandler):
         super(WatchHandler, self).__init__(ignore_patterns=[
             "{}/{}/*".format(src, dstdir),
             "{}/.git/*".format(src),
+            "*.swp",
         ], ignore_directories=True)
         self.src = src
         self.dstdir = dstdir
         self.command = command
 
-    def on_any_event(self, event):
+    def on_created(self, event):
         print("Change detected; rebuilding...")
 
         build(self.src, self.dstdir)
