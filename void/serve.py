@@ -1,5 +1,4 @@
 import http.server
-import os
 import socketserver
 
 
@@ -8,10 +7,9 @@ class TCPServer(socketserver.TCPServer):
 
 
 def serve(root, port):
-    Handler = http.server.SimpleHTTPRequestHandler
-
-    oldcwd = os.getcwd()
-    os.chdir(root)
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=root, **kwargs)
 
     print("Listening for requests on http://localhost:{}/".format(port))
 
@@ -21,4 +19,3 @@ def serve(root, port):
         except KeyboardInterrupt:
             httpd.shutdown()
             httpd.server_close()
-            os.chdir(oldcwd)
