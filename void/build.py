@@ -53,21 +53,22 @@ def build(srcroot, dstroot, rebuild=False):
         # do not descend into dstroot if it is a subdirectory of srcroot
         srcdirs[:] = [d for d in srcdirs if os.path.abspath(os.path.join(srcdir, d)) != os.path.abspath(dstroot)]
 
-        build_dirs(srcdirs, dstdirs, dstdir)
+        build_dirs(srcdirs, dstdirs, dstdir, rebuild=rebuild)
         build_files(srcfiles, dstfiles, srcdir, dstdir, rebuild=rebuild)
 
 def is_hidden_or_special(x):
     return x.startswith(".") or x.startswith("_")
 
-def build_dirs(srcdirs, dstdirs, dstdir):
+def build_dirs(srcdirs, dstdirs, dstdir, rebuild=False):
     srcdirset = set(srcdirs)
     dstdirset = set(dstdirs)
 
     # remove directories in dstdirs not in srcdirs
-    for d in (dstdirset - srcdirset):
-        print("rmtree {}".format(os.path.join(dstdir, d)))
-        shutil.rmtree(os.path.join(dstdir, d))
-        dstdirset.remove(d)
+    if rebuild:
+        for d in (dstdirset - srcdirset):
+            print("rmtree {}".format(os.path.join(dstdir, d)))
+            shutil.rmtree(os.path.join(dstdir, d))
+            dstdirset.remove(d)
 
     # create directories in srcdirs not in dstdirs
     for d in (srcdirset - dstdirset):
@@ -85,9 +86,10 @@ def build_files(srcfiles, dstfiles, srcdir, dstdir, rebuild=False):
         copy_or_render(srcfile, srcdir, dstdir, rebuild, dstfileset)
 
     # remove files in dstdir not in srcdir
-    for f in dstfileset:
-        print("rm {}".format(os.path.join(dstdir, f)))
-        os.unlink(os.path.join(dstdir, f))
+    if rebuild:
+        for f in dstfileset:
+            print("rm {}".format(os.path.join(dstdir, f)))
+            os.unlink(os.path.join(dstdir, f))
 
 def copy_or_render(srcfile, srcdir, dstdir, rebuild, dstfileset):
     dstfile = srcfile

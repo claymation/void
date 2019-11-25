@@ -23,10 +23,10 @@ def main():
         help="HTTP port",
         type=int, default=8000)
     parser.add_argument("-w", "--watch",
-        help="Watch src for changes, rebuild, and optionally run a command",
+        help="Watch src for changes, build, and optionally run a command",
         action="store_true")
     parser.add_argument("-W", "--watch-command",
-        help="Command to run after rebuilding watched src")
+        help="Command to run after building watched src")
 
     args = parser.parse_args()
 
