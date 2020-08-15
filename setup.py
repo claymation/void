@@ -20,6 +20,7 @@ setup(
         "awesome-slugify",
         "CommonMark",
         "Jinja2",
+        "watchdog",
     ],
     classifiers=[
         "Programming Language :: Python",
