@@ -27,6 +27,8 @@ def main():
         action="store_true")
     parser.add_argument("-W", "--watch-command",
         help="Command to run after building watched src")
+    parser.add_argument("-b", "--browser",
+        help="Browser to reload after building watched src")
 
     args = parser.parse_args()
 
@@ -41,7 +43,7 @@ def main():
     build(args.src, args.dstdir, rebuild=args.rebuild)
 
     if args.watch:
-        watch(args.src, args.dstdir, args.watch_command)
+        watch(args.src, args.dstdir, args.watch_command, args.browser)
 
     if args.serve:
         serve(args.dstdir, args.port)
