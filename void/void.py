@@ -1,5 +1,6 @@
 import argparse
 import os
+import pathlib
 
 from .build import build
 from .serve import serve
@@ -40,13 +41,19 @@ def main():
     except OSError:
         parser.error("failed to create dstdir {}".format(args.dstdir))
 
-    build(args.src, args.dstdir, rebuild=args.rebuild)
+    def absolute(d):
+        return pathlib.Path(d).absolute()
+
+    src    = absolute(args.src)
+    dstdir = absolute(args.dstdir)
+
+    build(src, dstdir, rebuild=args.rebuild)
 
     if args.watch:
-        watch(args.src, args.dstdir, args.watch_command, args.browser)
+        watch(src, dstdir, args.watch_command, args.browser)
 
     if args.serve:
-        serve(args.dstdir, args.port)
+        serve(dstdir, args.port)
 
 if __name__ == "__main__":
     main()
