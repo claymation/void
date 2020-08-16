@@ -213,7 +213,12 @@ def compile_code_fragments(ast, dstdir, dstfileset):
                                                 encoding="utf8",
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE)
+
                         node.literal = result.stdout
+
+                        if result.stderr:
+                            print(result.stderr)
+
 
 def extract_title(ast):
     for node, entering in ast.walker():
