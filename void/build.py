@@ -51,7 +51,11 @@ def build(srcroot, dstroot, rebuild=False):
         srcfiles[:] = [f for f in srcfiles if not is_hidden_or_special(f)]
 
         # do not descend into dstroot if it is a subdirectory of srcroot
-        srcdirs[:] = [d for d in srcdirs if os.path.abspath(os.path.join(srcdir, d)) != os.path.abspath(dstroot)]
+        srcdirs[:] = [
+            d for d in srcdirs
+            if (os.path.abspath(os.path.join(srcdir, d)) !=
+                os.path.abspath(dstroot))
+        ]
 
         build_dirs(srcdirs, dstdirs, dstdir, rebuild=rebuild)
         build_files(srcfiles, dstfiles, srcdir, dstdir, rebuild=rebuild)
