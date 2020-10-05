@@ -42,7 +42,7 @@ def main():
         parser.error("failed to create dstdir {}".format(args.dstdir))
 
     def absolute(d):
-        return pathlib.Path(d).absolute()
+        return str(pathlib.Path(d).absolute())
 
     src    = absolute(args.src)
     dstdir = absolute(args.dstdir)
